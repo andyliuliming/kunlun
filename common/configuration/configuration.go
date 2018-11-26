@@ -1,7 +1,5 @@
 package configuration
 
-import "github.com/Microsoft/kunlun/common/storage"
-
 type GlobalConfiguration struct {
 	StateDir string
 	Debug    bool
@@ -22,10 +20,8 @@ func (s StringSlice) ContainsAny(targets ...string) bool {
 }
 
 type Configuration struct {
-	Global               GlobalConfiguration
-	Command              string
-	SubcommandFlags      StringSlice
-	State                storage.State
-	ShowCommandHelp      bool
-	CommandModifiesState bool
+	Global          GlobalConfiguration
+	Command         string
+	SubcommandFlags StringSlice
+	ShowCommandHelp bool
 }

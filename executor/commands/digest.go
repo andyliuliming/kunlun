@@ -11,7 +11,6 @@ import (
 	qgraph "github.com/Microsoft/kunlun/artifacts/qgraph"
 	"github.com/Microsoft/kunlun/common/fileio"
 	"github.com/Microsoft/kunlun/common/flags"
-	"github.com/Microsoft/kunlun/common/helpers"
 	"github.com/Microsoft/kunlun/common/storage"
 	"github.com/Microsoft/kunlun/common/ui"
 	"github.com/andyliuliming/gquiz"
@@ -19,8 +18,7 @@ import (
 )
 
 type Digest struct {
-	stateStore   storage.Store
-	envIDManager helpers.EnvIDManager
+	stateStore storage.Store
 
 	fs fileio.Fs
 	ui *ui.UI
@@ -32,15 +30,13 @@ type DiegestConfig struct {
 
 func NewDigest(
 	stateStore storage.Store,
-	envIDManager helpers.EnvIDManager,
 	fs fileio.Fs,
 	ui *ui.UI,
 ) Digest {
 	return Digest{
-		stateStore:   stateStore,
-		envIDManager: envIDManager,
-		fs:           fs,
-		ui:           ui,
+		stateStore: stateStore,
+		fs:         fs,
+		ui:         ui,
 	}
 }
 
@@ -79,21 +75,21 @@ func (p Digest) Execute(args []string, state storage.State) error {
 	return err
 }
 
-func (p Digest) initialize(config DiegestConfig, state storage.State) (storage.State, error) {
+func (p Digest) initialize(config DiegestConfig, state storage.State) error {
 	var err error
-	state, err = p.envIDManager.Sync(state, config.Name)
-	if err != nil {
-		return storage.State{}, fmt.Errorf("Env id manager sync: %s", err)
-	}
+	// state, err = p.envIDManager.Sync(state, config.Name)
+	// if err != nil {
+	// 	return storage.State{}, fmt.Errorf("Env id manager sync: %s", err)
+	// }
 
-	err = p.stateStore.Set(state)
-	if err != nil {
-		return storage.State{}, fmt.Errorf("Save state: %s", err)
-	}
+	// err = p.stateStore.Set(state)
+	// if err != nil {
+	// 	return storage.State{}, fmt.Errorf("Save state: %s", err)
+	// }
 
 	artifactsVarsFilePath, err := p.stateStore.GetMainArtifactVarsFilePath()
 	if err != nil {
-		return storage.State{}, err
+		return err
 	}
 
 	qResult, err := p.doQuiz(artifactsVarsFilePath)

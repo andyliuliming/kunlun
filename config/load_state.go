@@ -6,14 +6,9 @@ import (
 
 	"github.com/Microsoft/kunlun/common/configuration"
 	"github.com/Microsoft/kunlun/common/fileio"
-	"github.com/Microsoft/kunlun/common/storage"
 	"github.com/Microsoft/kunlun/common/ui"
 	flags "github.com/jessevdk/go-flags"
 )
-
-type merger interface {
-	MergeGlobalFlagsToState(globalflags GlobalFlags, state storage.State) (storage.State, error)
-}
 
 type fs interface {
 	fileio.Stater
@@ -22,20 +17,17 @@ type fs interface {
 	fileio.FileWriter
 }
 
-func NewConfig(bootstrap storage.StateBootstrap, merger merger, ui *ui.UI, fs fs) Config {
+func NewConfig(ui *ui.UI, fs fs) Config {
 	return Config{
-		stateBootstrap: bootstrap,
-		merger:         merger,
-		ui:             ui,
-		fs:             fs,
+		// stateBootstrap: bootstrap,
+		ui: ui,
+		fs: fs,
 	}
 }
 
 type Config struct {
-	stateBootstrap storage.StateBootstrap
-	merger         merger
-	ui             *ui.UI
-	fs             fs
+	ui *ui.UI
+	fs fs
 }
 
 func ParseArgs(args []string) (GlobalFlags, []string, error) {
@@ -103,38 +95,14 @@ func (c Config) Bootstrap(globalFlags GlobalFlags, remainingArgs []string, argsL
 		}, nil
 	}
 
-	state, err := c.stateBootstrap.GetState(globalFlags.StateDir)
-	if err != nil {
-		return configuration.Configuration{}, err
-	}
-
-	state, err = c.merger.MergeGlobalFlagsToState(globalFlags, state)
-	if err != nil {
-		return configuration.Configuration{}, err
-	}
-
 	return configuration.Configuration{
 		Global: configuration.GlobalConfiguration{
 			Debug:    globalFlags.Debug,
 			StateDir: globalFlags.StateDir,
 			Name:     globalFlags.EnvID,
 		},
-		State:                state,
-		Command:              command,
-		SubcommandFlags:      remainingArgs[1:],
-		ShowCommandHelp:      false,
-		CommandModifiesState: modifiesState(command),
+		Command:         command,
+		SubcommandFlags: remainingArgs[1:],
+		ShowCommandHelp: false,
 	}, nil
-}
-
-func modifiesState(command string) bool {
-	_, ok := map[string]struct{}{
-		"analyze":    {}, // detect the project type and generate the draft manifests.
-		"plan-lift":  {}, // parse the draft manifests and generate the infrastructure manifests. (now in terraform)
-		"lift":       {}, // run the infra manifests. prepare the environment.
-		"plan-shift": {}, // generate the deployment scripts, (now in ansible)
-		"shift":      {}, // run the deployment scripts
-		"destroy":    {}, // destroy the environment we just setup.
-	}[command]
-	return ok
 }

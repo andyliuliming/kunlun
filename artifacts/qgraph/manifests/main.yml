@@ -4,6 +4,22 @@
       persistent: true
       description: "Admin name of your deployment?"
       default: "kluser"
+  transitions:
+    - name: iaas
+
+- name: iaas
+  questions:
+    - var_name: iaas
+      persistent: true
+      description: "What's your iaas provider(Only azure supported for now.)"
+      default: "azure"
+      default_env: "KL_IAAS"
+  transitions:
+    - name: azure
+      condition: "iaas == 'azure'"
+
+- name: azure
+  questions:
     - var_name: location
       persistent: true
       description: "Which region do you want to deploy to?"
@@ -11,6 +27,11 @@
     - var_name: resource_group_name
       persistent: true
       description: "What resource group name do you want?"
+  transitions:
+    - name: deploy_kind
+
+- name: deploy_kind
+  questions:
     - var_name: kind
       description: "Which kind of artifacts do you want?"
       candidates:

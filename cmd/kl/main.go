@@ -36,8 +36,8 @@ func main() {
 
 	// Configuration
 	stateStore := storage.NewStore(globals.StateDir, afs)
-	stateMerger := config.NewMerger(afs)
-	newConfig := config.NewConfig(stateBootstrap, stateMerger, stderrUI, afs)
+	// stateMerger := config.NewMerger(afs)
+	newConfig := config.NewConfig(stateBootstrap, stderrUI, afs)
 
 	appConfig, err := newConfig.Bootstrap(globals, remainingArgs, len(os.Args))
 	if err != nil {

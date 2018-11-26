@@ -1,12 +1,10 @@
 package executor
 
 import (
-	"crypto/rand"
 	"fmt"
 
 	"github.com/Microsoft/kunlun/common/configuration"
 	"github.com/Microsoft/kunlun/common/fileio"
-	"github.com/Microsoft/kunlun/common/helpers"
 	"github.com/Microsoft/kunlun/common/storage"
 	"github.com/Microsoft/kunlun/common/ui"
 	"github.com/Microsoft/kunlun/executor/commands"
@@ -33,11 +31,11 @@ func NewExecutor(
 	fs fileio.Fs,
 ) Executor {
 
-	envIDGenerator := helpers.NewEnvIDManager(rand.Reader)
+	// envIDGenerator := helpers.NewEnvIDManager(rand.Reader)
 
 	commandSet := commands.CommandSet{}
 	commandSet["help"] = commands.NewUsage(ui)
-	commandSet["analyze"] = commands.NewDigest(stateStore, envIDGenerator, fs, ui)
+	commandSet["analyze"] = commands.NewDigest(stateStore, fs, ui)
 	commandSet["interop"] = commands.NewInterop(stateStore)
 	commandSet["plan_infra"] = commands.NewPlanInfra(stateStore, fs, ui)
 	commandSet["apply_infra"] = commands.NewApplyInfra(stateStore, fs)
